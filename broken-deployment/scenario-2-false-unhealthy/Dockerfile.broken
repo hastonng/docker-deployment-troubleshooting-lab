@@ -1,0 +1,25 @@
+# BROKEN VARIANT — for the troubleshooting case study.
+# Do not use this Dockerfile to run the app; see ../../Dockerfile for the fix.
+#
+# Symptom: the app works perfectly (curl the mapped port succeeds), but
+# `docker ps` reports the container as "unhealthy", which causes
+# orchestrators (ECS, Kubernetes, Compose with `depends_on: condition:
+# service_healthy`) to kill and restart a perfectly working container.
+
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/ .
+
+EXPOSE 8080
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "app:app"]
+
+# THE BUG: this HEALTHCHECK targets port 5000 — Flask's own default port,
+# left over from an earlier version of this Dockerfile before the app was
+# switched to run on 8080. The app itself is fine; the probe is checking
+# the wrong thing entirely.
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request,sys; \
+    sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2).status == 200 else 1)"

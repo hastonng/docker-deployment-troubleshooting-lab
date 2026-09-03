@@ -1,0 +1,21 @@
+# BROKEN VARIANT — for the troubleshooting case study.
+# Do not use this file to run the app; see ../../docker-compose.yml for the fix.
+#
+# Symptom: the container starts, then exits almost immediately, then
+# restarts, then exits again — a classic crash loop. `docker ps` shows a
+# "Restarting" status that never settles.
+services:
+  task-tracker:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    image: task-tracker-api:broken3
+    ports:
+      - "8080:8080"
+    environment:
+      # THE BUG: this value was pasted straight out of `docker inspect`
+      # output (which shows ports as "8080/tcp"), instead of a plain
+      # integer. The app does `int(os.environ["PORT"])` to build the
+      # gunicorn bind address — that cast fails on this string.
+      PORT: "8080/tcp"
+    restart: on-failure:3

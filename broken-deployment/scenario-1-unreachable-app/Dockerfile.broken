@@ -1,0 +1,24 @@
+# BROKEN VARIANT — for the troubleshooting case study.
+# Do not use this Dockerfile to run the app; see ../../Dockerfile for the fix.
+#
+# Symptom: `docker run -p 8080:8080 ...` succeeds, `docker ps` shows the
+# container as Up, but curl/browser/health checks against the mapped port
+# from the HOST all fail or hang — while `docker exec <container> curl
+# localhost:8080` from INSIDE the container works fine.
+
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/ .
+
+EXPOSE 8080
+
+# THE BUG: binding to 127.0.0.1 means the app only accepts connections on
+# the container's own loopback interface. Docker's -p/--publish maps the
+# host port to the container's external (eth0) interface, not its
+# loopback — so traffic arriving via the published port never reaches a
+# process listening only on 127.0.0.1. This is one of the most common
+# "works in dev, dead in the container" bugs.
+CMD ["python", "-c", "from app import app; app.run(host='127.0.0.1', port=8080)"]
