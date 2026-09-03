@@ -3,7 +3,7 @@
 A small, real (not toy) demo of how I diagnose and fix container
 deployment problems — built as a case study, not a tutorial.
 
-> Replace `<github-username>` below with your actual GitHub username once
+> Replace `hastonng` below with your actual GitHub username once
 > the repo is pushed, so the CI badge and links resolve.
 
 [![CI](https://github.com/<github-username>/docker-deployment-troubleshooting-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/<github-username>/docker-deployment-troubleshooting-lab/actions/workflows/ci.yml)
