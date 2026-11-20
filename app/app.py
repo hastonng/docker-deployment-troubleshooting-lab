@@ -80,5 +80,5 @@ if __name__ == "__main__":
     # Host 0.0.0.0 so the container's port mapping actually works —
     # binding to 127.0.0.1 here is one of the classic "works on my
     # machine, dead in the container" mistakes this lab is built to show.
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", "8080"))
     app.run(host="0.0.0.0", port=port)
