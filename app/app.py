@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from flask import Flask, jsonify, request
 
@@ -52,7 +52,7 @@ def health():
     body = {
         "status": "healthy" if healthy else "unhealthy",
         "uptime_seconds": uptime_seconds,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "env": os.environ.get("APP_ENV", "development"),
     }
     return jsonify(body), 200 if healthy else 503
