@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from flask import Flask, jsonify, request
 
@@ -52,7 +52,7 @@ def health():
     body = {
         "status": "healthy" if healthy else "unhealthy",
         "uptime_seconds": uptime_seconds,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "env": os.environ.get("APP_ENV", "development"),
     }
     return jsonify(body), 200 if healthy else 503
@@ -80,5 +80,5 @@ if __name__ == "__main__":
     # Host 0.0.0.0 so the container's port mapping actually works —
     # binding to 127.0.0.1 here is one of the classic "works on my
     # machine, dead in the container" mistakes this lab is built to show.
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", "8080"))
     app.run(host="0.0.0.0", port=port)
